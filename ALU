@@ -1,2 +1,68 @@
-بسم الله الرحمن الرحيم
-بطل تُقل بقى يا خيري.
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+
+entity New_ALU is
+port(A: in std_logic_vector (31 downto 0);
+     B: in std_logic_vector (31 downto 0);
+     CTR: in std_logic_vector (1 downto 0);
+     Result: out std_logic_vector (31 downto 0);
+     N,Z,C,V: out std_logic);
+end entity;
+
+architecture rtl of New_ALU is
+signal sum: std_logic_vector(31 downto 0);
+signal Carry: std_logic;
+begin
+process(CTR,A,B)
+begin
+case CTR is 
+  when "00" =>  Carry <= CTR(0);  --Summation--
+                for i in 0 to 31 loop
+		sum(i) <= A(i) xor B(i) xor Carry;
+		Carry <= (A(i) and B(i)) or (A(i) and Carry) or (B(i) and Carry); --The last Carry is either 0 or 1 not a vector--
+		end loop;
+                C <= Carry;
+                N <= sum(31);
+                V <= CTR(1) and (sum(31) xor A(31)) and (A(31) xnor B(31) xnor CTR(0));
+                if (sum="00000000000000000000000000000000") then --Define Zero FLAG---
+                Z<='1';                  
+                else
+                Z<='0';
+                end if;
+  when "01" =>  Carry <= CTR(0);  --Substraction--
+                for i in 0 to 31 loop
+		sum(i) <= A(i) xor (NOT B(i)) xor Carry;
+		Carry <= (A(i) and (NOT B(i))) or (A(i) and Carry) or ((NOT B(i)) and Carry); --The last Carry is either 0 or 1 not a vector--
+		end loop;
+                C <= Carry;
+                N <= sum(31);
+                V <= CTR(1) and (sum(31) xor A(31)) and (A(31) xnor B(31) xnor CTR(0));
+                if (sum="00000000000000000000000000000000") then --Define Zero FLAG---
+                Z<='1';                  
+                else
+                Z<='0';
+                end if; 
+  when "10" =>  sum <= A and B;
+		C <= '0';
+                N <= sum(31);
+                V <= CTR(1) and (sum(31) xor A(31)) and (A(31) xnor B(31) xnor CTR(0));
+		if (sum="00000000000000000000000000000000") then --Define Zero FLAG---
+                Z<='1';                  
+                else
+                Z<='0';
+                end if; 
+when others =>  sum <= A or B;
+		C <= '0';
+                N <= sum(31);
+                V <= CTR(1) and (sum(31) xor A(31)) and (A(31) xnor B(31) xnor CTR(0));
+		if (sum="00000000000000000000000000000000") then --Define Zero FLAG---
+                Z<='1';                  
+                else
+                Z<='0';
+                end if;
+                  
+end case;
+end process;
+Result<=sum;
+end rtl;
