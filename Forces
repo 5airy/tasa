@@ -1,0 +1,6 @@
+force -freeze sim:/alu4/A 11111111111111111111111111111111 0
+force -freeze sim:/alu4/B 11111111111111110000000000000000 0
+force -freeze sim:/alu4/CTR 00 0
+force -freeze sim:/alu4/CTR 01 100
+force -freeze sim:/alu4/CTR 00 300
+force -freeze sim:/alu4/CTR 01 500
