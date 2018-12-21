@@ -6,15 +6,16 @@ entity decoder is
 port(Op: in std_logic_vector(1 downto 0);
      Funct: in std_logic_vector(5 downto 0);
      Rd: in std_logic_vector(3 downto 0);
+     FlagW:out std_logic_vector(1 downto 0);
      PCS,RegW,MemW,MemtoReg,ALUSrc: out std_logic;
-     FlagW,ImmSrc,RegSrc,ALUCTR:out std_logic_vector(1 downto 0));
+     ImmSrc,RegSrc,ALUControl:out std_logic_vector(1 downto 0));
 end entity;
 
 architecture rtl of decoder is --Main decoder
 signal op2: std_logic_vector(3 downto 0);
 signal controls: std_logic_vector(9 downto 0);
-signal Branch,ALUOp,RegW_temp: std_logic;
-signal ALUCTR_temp: std_logic_vector(1 downto 0);
+signal Branch,ALUOp,RegW_temp,Rd15_check: std_logic;
+signal ALUcontrol_temp: std_logic_vector(1 downto 0);
 begin
 op2<=(Op(1),Op(0),Funct(5),Funct(0));
 process (Op,Funct,Rd)
@@ -33,20 +34,24 @@ process (Op,Funct,Rd,ALUOp,controls) ---ALU Decoder
 begin
 if (ALUOp='1') then
  case Funct(4 downto 1) is
- when "0100" => ALUCTR_temp <="00"; --ADD
- when "0010" => ALUCTR_temp <="01"; --SUB
- when "0000" => ALUCTR_temp <="10"; --AND
- when "1100" => ALUCTR_temp <="11"; --ORR
- when others => ALUCTR_temp <="--"; --Unimplmented
+ when "0100" => ALUControl_temp <="00"; --ADD
+ when "0010" => ALUControl_temp <="01"; --SUB
+ when "0000" => ALUControl_temp <="10"; --AND
+ when "1100" => ALUControl_temp <="11"; --ORR
+ when others => ALUControl_temp <="--"; --Unimplmented
 end case;
 FlagW(1)<=Funct(0);
-FlagW(0)<=Funct(0) and (not ALUCTR_temp(1));
+FlagW(0)<=Funct(0) and (not ALUControl_temp(1));
 else
-ALUCTR_temp<="00";
+ALUControl_temp<="00";
 FlagW<="00";
 end if;
+if (Rd="1111") then  --This created by ElSayed, NOT implemented in the book--
+Rd15_check<='1';        -- The reason why I did this (If condition) is to identify is Rd==15 or not, so that it's used in line 56 to determine 
+else Rd15_check<='0'; -- if the user is assigning a value to R15 or not, in other words: determine the next instruction to decode.
+end if; 
 end process;
-ALUCTR<=ALUCTR_temp;
+ALUControl<=ALUControl_temp;
 RegW<=RegW_temp;
-PCS<=(Rd(0) and RegW_temp) or Branch; --- HABDA, I will ask the doctor---
+PCS<=(Rd15_check and RegW_temp) or Branch; --- My touch is here---
 end rtl;
