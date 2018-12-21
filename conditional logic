@@ -3,10 +3,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 
 entity conditional_logic is
-port(clk,reset,PCS,RegW,MemW:in std_logic;
-     Cond,AluFlags:in std_logic_vector(3 downto 0);
+port(clk,reset:in std_logic;
+     Cond,ALUFlags:in std_logic_vector(3 downto 0);
      FlagW:in std_logic_vector(1 downto 0);
-     PCsrc,RegWrite,MemWrite: out std_logic);
+     PCS,RegW,MemW:in std_logic;
+     PCsrc,RegWrite,MemWrite: out std_logic);             
 end entity;
 
 architecture rtl of conditional_logic is
