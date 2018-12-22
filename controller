@@ -4,7 +4,7 @@ use ieee.NUMERIC_STD_UNSIGNED.all;
 
 entity controller is
 port(clk,reset: in std_logic;
-     Instr:in  std_logic_vector(31 downto 0);
+     Instr:in  std_logic_vector(31 downto 12);
      ALUFlags: in std_logic_vector(3 downto 0);
      RegSrc: out std_logic_vector(1 downto 0);
      RegWrite:out std_logic;
@@ -23,13 +23,15 @@ port(clk,reset:in std_logic;
      PCsrc,RegWrite,MemWrite: out std_logic);             
 end component;
 
-component decoder is
-port(Op: in std_logic_vector(1 downto 0);
-     Funct: in std_logic_vector(5 downto 0);
-     Rd: in std_logic_vector(3 downto 0);
-     FlagW:out std_logic_vector(1 downto 0);
-     PCS,RegW,MemW,MemtoReg,ALUSrc: out std_logic;
-     ImmSrc,RegSrc,ALUControl:out std_logic_vector(1 downto 0));
+component decoder is -- main control decoder
+port(Op: in STD_LOGIC_VECTOR(1 downto 0);
+    Funct: in STD_LOGIC_VECTOR(5 downto 0);
+    Rd: in STD_LOGIC_VECTOR(3 downto 0);
+    FlagW: out STD_LOGIC_VECTOR(1 downto 0);
+    PCS, RegW, MemW: out STD_LOGIC;
+    MemtoReg, ALUSrc: out STD_LOGIC;
+    ImmSrc, RegSrc: out STD_LOGIC_VECTOR(1 downto 0);
+    ALUControl: out STD_LOGIC_VECTOR(1 downto 0));
 end component;
 
 signal FlagW: std_logic_vector(1 downto 0);
