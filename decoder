@@ -1,57 +1,47 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-
-entity decoder is
-port(Op: in std_logic_vector(1 downto 0);
-     Funct: in std_logic_vector(5 downto 0);
-     Rd: in std_logic_vector(3 downto 0);
-     FlagW:out std_logic_vector(1 downto 0);
-     PCS,RegW,MemW,MemtoReg,ALUSrc: out std_logic;
-     ImmSrc,RegSrc,ALUControl:out std_logic_vector(1 downto 0));
-end entity;
-
-architecture rtl of decoder is --Main decoder
-signal op2: std_logic_vector(3 downto 0);
-signal controls: std_logic_vector(9 downto 0);
-signal Branch,ALUOp,RegW_temp,Rd15_check: std_logic;
-signal ALUcontrol_temp: std_logic_vector(1 downto 0);
+library IEEE; use IEEE.STD_LOGIC_1164.all;
+entity decoder is -- main control decoder
+port(Op: in STD_LOGIC_VECTOR(1 downto 0);
+Funct: in STD_LOGIC_VECTOR(5 downto 0);
+Rd: in STD_LOGIC_VECTOR(3 downto 0);
+FlagW: out STD_LOGIC_VECTOR(1 downto 0);
+PCS, RegW, MemW: out STD_LOGIC;
+MemtoReg, ALUSrc: out STD_LOGIC;
+ImmSrc, RegSrc: out STD_LOGIC_VECTOR(1 downto 0);
+ALUControl: out STD_LOGIC_VECTOR(1 downto 0));
+end;
+architecture behave of decoder is
+signal controls: STD_LOGIC_VECTOR(9 downto 0);
+signal ALUOp, Branch: STD_LOGIC;
+signal op2: STD_LOGIC_VECTOR(3 downto 0);
 begin
-op2<=(Op(1),Op(0),Funct(5),Funct(0));
-process (Op,Funct,Rd)
-begin
-case(op2) is
- when "000-" => controls <="0000001001";
- when "001-" => controls <="0000101001";
- when "01-0" => controls <="1001110100";
- when "01-1" => controls <="0001111000";
- when "10--" => controls <="0110100010";
- when others => controls <="----------";
-end case;
+op2 <= (Op, Funct(5), Funct(0));
+process(all) begin -- Main Decoder
+case? (op2) is
+when "000-" => controls <= "0000001001";
+when "001-" => controls <= "0000101001";
+when "01-0" => controls <= "1001110100";
+when "01-1" => controls <= "0001111000";
+when "10--" => controls <= "0110100010";
+when others => controls <= "----------";
+end case?;
 end process;
-(RegSrc(1),RegSrc(0),ImmSrc(1),ImmSrc(0),ALUSrc,MemtoReg,RegW,MemW,Branch,ALUOp)<=controls;
-process (Op,Funct,Rd,ALUOp,controls) ---ALU Decoder
-begin
-if (ALUOp='1') then
- case Funct(4 downto 1) is
- when "0100" => ALUControl_temp <="00"; --ADD
- when "0010" => ALUControl_temp <="01"; --SUB
- when "0000" => ALUControl_temp <="10"; --AND
- when "1100" => ALUControl_temp <="11"; --ORR
- when others => ALUControl_temp <="--"; --Unimplmented
+(RegSrc, ImmSrc, ALUSrc, MemtoReg, RegW, MemW,
+Branch, ALUOp) <= controls;
+process(all) begin -- ALU Decoder
+if (ALUOp) then
+case Funct(4 downto 1) is
+when "0100" => ALUControl <= "00"; -- ADD
+when "0010" => ALUControl <= "01"; -- SUB
+when "0000" => ALUControl <= "10"; -- AND
+when "1100" => ALUControl <= "11"; -- ORR
+when others => ALUControl <= "--"; -- unimplemented
 end case;
-FlagW(1)<=Funct(0);
-FlagW(0)<=Funct(0) and (not ALUControl_temp(1));
+FlagW(1) <= Funct(0);
+FlagW(0) <= Funct(0) and (not ALUControl(1));
 else
-ALUControl_temp<="00";
-FlagW<="00";
+ALUControl <= "00";
+FlagW <= "00";
 end if;
-if (Rd="1111") then  --This created by ElSayed, NOT implemented in the book--
-Rd15_check<='1';        -- The reason why I did this (If condition) is to identify is Rd==15 or not, so that it's used in line 56 to determine 
-else Rd15_check<='0'; -- if the user is assigning a value to R15 or not, in other words: determine the next instruction to decode.
-end if; 
 end process;
-ALUControl<=ALUControl_temp;
-RegW<=RegW_temp;
-PCS<=(Rd15_check and RegW_temp) or Branch; --- My touch is here---
-end rtl;
+PCS <= ((and Rd) and RegW) or Branch;
+end;
