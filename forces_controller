@@ -1,0 +1,5 @@
+force -freeze sim:/controller/clk 1 0, 0 {50 ps} -r 100
+force -freeze sim:/controller/reset 0 0
+force -freeze sim:/controller/reset 1 1400
+force -freeze sim:/controller/ALUFlags 1010 0
+force -freeze sim:/controller/Instr 11100001100010101001 0 
