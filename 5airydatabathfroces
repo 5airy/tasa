@@ -1,0 +1,39 @@
+force -freeze sim:/datapath/clk 1 0, 0 {50 ps} -r 100
+
+force -freeze sim:/datapath/reset 1 0
+force -freeze sim:/datapath/reset 0 100
+
+force -freeze sim:/datapath/RegSrc 00 0
+
+force -freeze sim:/datapath/RegWrite 1 0
+
+force -freeze sim:/datapath/ImmSrc 01 0
+
+force -freeze sim:/datapath/ALUSrc 1 0
+
+force -freeze sim:/datapath/ALUControl 00 0
+
+force -freeze sim:/datapath/MemtoReg 1 0
+
+force -freeze sim:/datapath/PCSrc 0 0
+
+force -freeze sim:/datapath/Instr 11100111100101000011000000000101 0
+
+force -freeze sim:/datapath/ReadData 00000000000000000000000000100000 0
+
+force -freeze sim:/datapath/RegSrc 00 200
+
+force -freeze sim:/datapath/RegWrite 1 200
+
+force -freeze sim:/datapath/ImmSrc 00 200
+
+force -freeze sim:/datapath/ALUSrc 1 200
+
+force -freeze sim:/datapath/ALUControl 00 200
+
+force -freeze sim:/datapath/MemtoReg 0 200
+
+force -freeze sim:/datapath/PCSrc 0 200
+
+force -freeze sim:/datapath/Instr 11100010100000010000000000101010 200
+
