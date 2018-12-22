@@ -3,12 +3,11 @@ use ieee.std_logic_1164.all;
 use ieee.NUMERIC_STD_UNSIGNED.all;
 
 entity ALU is
---generic ( h : integer := 32);--
 port(A: in std_logic_vector (31 downto 0);
      B: in std_logic_vector (31 downto 0);
      CTR: in std_logic_vector (1 downto 0);
      Result: out std_logic_vector (31 downto 0);
-     N,Z,C,V: out std_logic);
+     ALUFlags: out std_logic_vector(3 downto 0)); --N,Z,C,V--
 end entity;
 
 architecture rtl of ALU is
@@ -27,13 +26,13 @@ when others =>
  Result_temp<=("0" & A)or("0" & B);
 end case;
 if (Result_temp="00000000000000000000000000000000") then --Define Zero FLAG---
- Z<='1';                  
+ ALUFlags(2)<='1';                  
   else
- Z<='0';
+ ALUFlags(2)<='0';
   end if;
 end process;
-V <= CTR(1) and (Result_temp(31) xor A(31-1))and(A(31)xnor B(31) xnor CTR(0));
-C<=Result_temp(32);
-N<=Result_temp(31);
+ALUFlags(0) <= CTR(1) and (Result_temp(31) xor A(31-1))and(A(31)xnor B(31) xnor CTR(0));
+ALUFlags(1)<=Result_temp(32);
+ALUFlags(3)<=Result_temp(31);
 Result<=Result_temp(31 downto 0);
 end rtl;
