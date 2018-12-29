@@ -3,8 +3,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std_unsigned.all;
 entity top_level is -- top-level design for testing
 port(clk, reset: in STD_LOGIC;
-WriteData, DataAdr: buffer STD_LOGIC_VECTOR(31 downto 0);
-MemWrite: buffer STD_LOGIC);
+WriteData, DataAdr: out STD_LOGIC_VECTOR(31 downto 0);
+MemWrite: out STD_LOGIC);
 end;
 architecture test of top_level is
 component scp
